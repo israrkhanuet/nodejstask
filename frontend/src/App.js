@@ -29,7 +29,7 @@ function App() {
           <Navbar bg='dark' variant='dark'>
             <Container>
               <LinkContainer to='/'>
-                <Navbar.Brand>Frontend for Backend Problems</Navbar.Brand>
+                <Navbar.Brand>Home</Navbar.Brand>
               </LinkContainer>
               <Nav className='me-auto'>
                 {userInfo ? (
@@ -74,29 +74,3 @@ function App() {
 }
 
 export default App;
-
-// import data from "./data";
-
-// function App() {
-//   return (
-//     <div>
-//       <header>
-//         <a href='/'>Bannudeals</a>
-//       </header>
-//       <main>
-//         <h1>Featured Products</h1>
-//         <div className='products'>
-//           {data.products.map((product) => (
-//             <div className='products' key={product.slug}>
-//               <img src={product.image} alt={product.name} />
-//               <p>{product.name}</p>
-//               <p>{product.price}</p>
-//             </div>
-//           ))}
-//         </div>
-//       </main>
-//     </div>
-//   );
-// }
-
-// export default App;

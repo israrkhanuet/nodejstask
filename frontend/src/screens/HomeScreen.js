@@ -85,13 +85,24 @@ function HomeScreen() {
     return true;
   };
 
+  const getToken = () => {
+    const userInfo = localStorage.getItem("userInfo");
+    return userInfo ? JSON.parse(userInfo).token : null;
+  };
+
+  const createHeaders = () => {
+    const token = getToken();
+    return {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    };
+  };
+
   const createUser = async () => {
     if (!checkLoginAndRedirect()) {
       return;
     }
-
     const { id, name, email, post, department } = createData;
-
     try {
       const response = await axios.post(
         "http://localhost:3001/api/crud/create",
@@ -101,7 +112,8 @@ function HomeScreen() {
           email,
           post,
           department,
-        }
+        },
+        { headers: createHeaders() }
       );
 
       if (response.data._id) {
@@ -110,7 +122,7 @@ function HomeScreen() {
         toast.error("Error creating user");
       }
     } catch (error) {
-      toast.error("Error creating user");
+      toast.error(error.message);
     }
 
     readUsers();
@@ -126,7 +138,8 @@ function HomeScreen() {
     try {
       const response = await axios.put(
         `http://localhost:3001/api/crud/update/${id}`,
-        { id, name, email, post, department }
+        { id, name, email, post, department },
+        { headers: createHeaders() }
       );
       if (response.data) {
         toast.success(response.data.message);
@@ -149,7 +162,8 @@ function HomeScreen() {
 
     try {
       const response = await axios.delete(
-        `http://localhost:3001/api/crud/delete/${id}`
+        `http://localhost:3001/api/crud/delete/${id}`,
+        { headers: createHeaders() }
       );
 
       if (response.data) {
@@ -166,11 +180,83 @@ function HomeScreen() {
 
   const readUsers = async () => {
     try {
-      const result = await axios.get("http://localhost:3001/api/crud/read");
+      const result = await axios.get("http://localhost:3001/api/crud/read", {
+        headers: createHeaders(), //
+      });
       dispatch({ type: "FETCH_SUCCESS", payload: result.data });
       clearInputs();
     } catch (error) {
       dispatch({ type: "FETCH_FAIL", payload: getError(error) });
+    }
+  };
+
+  const handleFileSystem = async () => {
+    if (!checkLoginAndRedirect()) {
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:3001/filesystem", {
+        headers: createHeaders(),
+      });
+      const data = await response.json();
+
+      document.getElementById(
+        "fileslength"
+      ).innerText = `${data.length}  files found in the directory`;
+
+      const filesystemResultContainer =
+        document.getElementById("filesystemResult");
+      filesystemResultContainer.innerHTML = "";
+
+      for (const item of data) {
+        const itemElement = document.createElement("div");
+        itemElement.textContent = item;
+        filesystemResultContainer.appendChild(itemElement);
+      }
+    } catch (error) {
+      toast.error("Error fetching filesystem:", error.message);
+    }
+  };
+
+  const handleError = async () => {
+    if (!checkLoginAndRedirect()) {
+      return;
+    }
+    const response = await fetch("http://localhost:3001/error", {
+      headers: createHeaders(),
+    });
+    if (!response.ok) {
+      toast.error(`Error: ${response.status} - ${response.statusText}`);
+      document.getElementById(
+        "errorResult"
+      ).innerText = `Error: ${response.status} - ${response.statusText}`;
+    } else {
+      const data = await response.json();
+      document.getElementById("errorResult").innerText = JSON.stringify(data);
+    }
+  };
+
+  const handleAsync = async () => {
+    if (!checkLoginAndRedirect()) {
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:3001/asyncdata", {
+        headers: createHeaders(),
+      });
+      const data = await response.json();
+
+      const resultList = document.getElementById("asyncResult");
+
+      data.forEach((item) => {
+        const listItem = document.createElement("li");
+        listItem.innerText = `Id: ${item.id} - Title: ${item.title} - Description: ${item.body}`;
+        resultList.appendChild(listItem);
+      });
+    } catch (error) {
+      toast.error("Error handling asynchronous data:", error.message);
     }
   };
 
@@ -369,6 +455,40 @@ function HomeScreen() {
           onClick={deleteUser}
         >
           Delete User
+        </Button>
+      </Form>
+      <Form className=' mb-5'>
+        <p id='fileslength'></p>
+        <div id='filesystemResult'></div>
+        <Button
+          variant='primary'
+          className='mt-3'
+          type='button'
+          onClick={handleFileSystem}
+        >
+          File System
+        </Button>
+      </Form>
+      <Form className=' mb-5'>
+        <p id='errorResult'></p>
+        <Button
+          variant='warning'
+          className='mt-3'
+          type='button'
+          onClick={handleError}
+        >
+          Handle Error
+        </Button>
+      </Form>
+      <Form className=' mb-5'>
+        <ul id='asyncResult'></ul>
+        <Button
+          variant='success'
+          className='mt-3'
+          type='button'
+          onClick={handleAsync}
+        >
+          Handle Asynchronous Data
         </Button>
       </Form>
     </div>

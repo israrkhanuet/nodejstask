@@ -1,4 +1,7 @@
 import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 export const generateToken = (user) => {
   return jwt.sign(
@@ -11,3 +14,26 @@ export const generateToken = (user) => {
     { expiresIn: "30d" }
   );
 };
+
+const secretKey = process.env.JWT_SECRET;
+
+const verifyToken = (req, res, next) => {
+  const token = req.headers.authorization;
+  console.log("Token:", token);
+
+  if (!token) {
+    return res.status(401).json({ error: "Unauthorized - Token missing" });
+  }
+
+  try {
+    const decoded = jwt.verify(token, secretKey);
+    console.log("Decoded:", decoded);
+    req.user = decoded;
+    next();
+  } catch (error) {
+    console.error("Token verification error:", error.message);
+    return res.status(401).json({ error: "Unauthorized - Invalid token" });
+  }
+};
+
+export default verifyToken;

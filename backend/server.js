@@ -17,7 +17,6 @@ mongoose
 const app = express();
 const port = 3001;
 
-// Middleware for parsing JSON in the request body
 app.use(bodyParser.json());
 app.use(cors());
 app.use("/login", loginRoutes);
@@ -77,37 +76,6 @@ app.get("/filesystem", (req, res) => {
     const filteredFiles = files.filter((file) => file.endsWith(fileExtension));
     res.json(filteredFiles);
   });
-});
-
-// Problem 4: Database Interaction (using an in-memory array as a simple database)
-// let users = [
-//   { id: 1, name: "User 1" },
-//   { id: 2, name: "User 2" },
-// ];
-
-// app.get("/database", (req, res) => {
-//   res.json(users);
-// });
-
-// app.post("/database", (req, res) => {
-//   const newUser = req.body;
-//   users.push(newUser);
-//   res.json(newUser);
-// });
-
-// Problem 5: Authentication
-// const secretKey = "your-secret-key";
-
-app.post("/auth", (req, res) => {
-  const { username, password } = req.body;
-
-  // Replace this with your actual authentication logic
-  if (username === "user" && password === "pass") {
-    const token = jwt.sign({ username }, secretKey, { expiresIn: "1h" });
-    res.json({ token });
-  } else {
-    res.status(401).json({ error: "Unauthorized" });
-  }
 });
 
 // Example protected endpoint

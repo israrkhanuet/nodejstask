@@ -47,7 +47,7 @@ export default function SigninScreen() {
         <title>Sing In</title>
       </Helmet>
       <h1>Sign In</h1>
-      <Form onSubmit={submitHandler}>
+      <Form onSubmit={submitHandler} className='mb-5'>
         <Form.Group className='mb-3' controlId='email'>
           <Form.Label>Email</Form.Label>
           <Form.Control
