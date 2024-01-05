@@ -1,7 +1,13 @@
 How to start ?
-1.cd backend than type command 'npm install'
-2.npm start
+Open two terminals from the first terminal type:
+1.cd backend 
+2.'npm install'
+3.npm start
 
-than
-1.cd frontend than type command 'npm install'
-2.npm start
+than in second terminal type:
+1.cd frontend 
+2.npm install
+3.npm start
+
+Now your app is ready...
+From the frontend you can see the backend function work..
