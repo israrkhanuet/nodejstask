@@ -53,9 +53,9 @@ function HomeScreen() {
 
   useEffect(() => {
     const fetchData = async () => {
-      dispatch({ type: "FETCH_REQUEST" });
       try {
-        const result = await axios.get("http://localhost:3001/api/crud/read");
+        dispatch({ type: "FETCH_REQUEST" });
+        const result = await axios.get("http://localhost:3001/read");
         dispatch({ type: "FETCH_SUCCESS", payload: result.data });
       } catch (error) {
         dispatch({ type: "FETCH_FAIL", payload: getError(error) });
@@ -93,7 +93,7 @@ function HomeScreen() {
   const createHeaders = () => {
     const token = getToken();
     return {
-      Authorization: `Bearer ${token}`,
+      Authorization: `${token}`,
       "Content-Type": "application/json",
     };
   };
@@ -115,14 +115,14 @@ function HomeScreen() {
         },
         { headers: createHeaders() }
       );
-
       if (response.data._id) {
         toast.success("User created successfully");
+        clearInputs();
       } else {
         toast.error("Error creating user");
       }
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.response.data.error || error.message);
     }
 
     readUsers();
@@ -141,7 +141,7 @@ function HomeScreen() {
         { id, name, email, post, department },
         { headers: createHeaders() }
       );
-      if (response.data) {
+      if (response.status === 200) {
         toast.success(response.data.message);
       } else {
         toast.error("Error updating user");
@@ -180,8 +180,8 @@ function HomeScreen() {
 
   const readUsers = async () => {
     try {
-      const result = await axios.get("http://localhost:3001/api/crud/read", {
-        headers: createHeaders(), //
+      const result = await axios.get("http://localhost:3001/read", {
+        headers: createHeaders(),
       });
       dispatch({ type: "FETCH_SUCCESS", payload: result.data });
       clearInputs();

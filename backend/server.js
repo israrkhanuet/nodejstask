@@ -2,12 +2,13 @@ import express from "express";
 import bodyParser from "body-parser";
 import axios from "axios";
 import fs from "fs";
-import jwt from "jsonwebtoken";
 import cors from "cors";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 import crudRouter from "./routes/crudRoute.js";
 import loginRoutes from "./routes/loginRoutes.js";
+import Employe from "./models/employeModel.js";
+import verifyToken from "./authUtils.js";
 
 dotenv.config();
 mongoose
@@ -19,8 +20,19 @@ const port = 3001;
 
 app.use(bodyParser.json());
 app.use(cors());
+
+app.get("/read", async (req, res) => {
+  try {
+    const items = await Employe.find();
+    res.status(200).json(items);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Problem 5: Authentication
 app.use("/login", loginRoutes);
-app.use("/api/crud", crudRouter);
+app.use("/api/crud", verifyToken, crudRouter);
 
 // Problem 1: Asynchronous Operations
 app.get("/asyncdata", async (req, res) => {
@@ -55,9 +67,10 @@ app.get("/asyncdata", async (req, res) => {
 
 // Problem 2: Error Handling
 app.get("/error", async (req, res) => {
+  // "https://jsonplaceholder.typicode.com/posts/1"
   try {
     const response = await axios.get(
-      "https://jsonplaceholder.typicode.com/posts/1"
+      "https://jsonplaceholder.typicode.com/pos/1"
     );
     res.json(response.data);
   } catch (error) {
@@ -76,21 +89,6 @@ app.get("/filesystem", (req, res) => {
     const filteredFiles = files.filter((file) => file.endsWith(fileExtension));
     res.json(filteredFiles);
   });
-});
-
-// Example protected endpoint
-app.get("/protected", (req, res) => {
-  // Verify the token before granting access
-  const token = req.headers.authorization;
-  try {
-    const decoded = jwt.verify(token, secretKey);
-    res.json({
-      message: "Access granted to protected resource",
-      user: decoded.username,
-    });
-  } catch (error) {
-    res.status(401).json({ error: "Unauthorized" });
-  }
 });
 
 // Start the server

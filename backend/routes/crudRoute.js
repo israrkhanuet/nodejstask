@@ -20,24 +20,16 @@ crudRouter.post("/create", async (req, res) => {
   }
 });
 
-// Read
-crudRouter.get("/read", async (req, res) => {
-  try {
-    const items = await Employe.find();
-    res.status(200).json(items);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
 // Update
 crudRouter.put("/update/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    const updatedItem = await Employe.findOneAndUpdate({ id: id }, req.body, {
-      new: true,
-    });
-    res.status(200).send({ message: "User updated successfully" });
+    const updatedItem = await Employe.findOneAndUpdate(
+      { id: id },
+      { $set: req.body },
+      { new: true }
+    );
+    res.status(200).send({ message: "User updated successfully", updatedItem });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

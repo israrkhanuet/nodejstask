@@ -19,7 +19,6 @@ const secretKey = process.env.JWT_SECRET;
 
 const verifyToken = (req, res, next) => {
   const token = req.headers.authorization;
-  console.log("Token:", token);
 
   if (!token) {
     return res.status(401).json({ error: "Unauthorized - Token missing" });
@@ -27,7 +26,6 @@ const verifyToken = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, secretKey);
-    console.log("Decoded:", decoded);
     req.user = decoded;
     next();
   } catch (error) {

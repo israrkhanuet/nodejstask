@@ -2,7 +2,7 @@ import express from "express";
 import bcrypt from "bcryptjs";
 import expressAsyncHandler from "express-async-handler";
 import User from "../models/userModel.js";
-import { generateToken } from "../utils.js";
+import { generateToken } from "../authUtils.js";
 
 const userRouter = express.Router();
 
